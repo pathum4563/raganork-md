@@ -10,7 +10,7 @@ const fs = require('fs');
 const ffmpeg = require('fluent-ffmpeg');
 const {
     skbuffer
-} = require('raganork-bot');
+} = require('𝐵𝐿𝛥𝐶𝛫 𝑄𝛯𝛯𝛮');
 const Config = require('../config');
 const {
     MODE,
@@ -37,9 +37,9 @@ Module({
     var exif = {
         author: STICKER_DATA.split(";")[1] || "",
         packname: message.senderName,
-        categories: STICKER_DATA.split(";")[2] || "😂",
-        android: "https://github.com/souravkl11/Raganork-md/",
-        ios: "https://github.com/souravkl11/Raganork-md/"
+        categories: STICKER_DATA.split(";")[2] || "🌿",
+        android: "https://github.com/pathum4563/Raganork-md/",
+        ios: "https://github.com/pathum4563/Raganork-md/"
     }
     if (message.reply_message.image === true) {
         return await message.client.sendMessage(message.jid,{sticker: fs.readFileSync(await addExif(await sticker(savedFile),exif))},{quoted: message.quoted})
@@ -139,9 +139,9 @@ Module({
         var exif = {
             author: STICKER_DATA.split(";")[1] || "",
             packname: message.senderName,
-            categories: STICKER_DATA.split(";")[2] || "😂",
-            android: "https://github.com/souravkl11/Raganork-md/",
-            ios: "https://github.com/souravkl11/Raganork-md/"
+            categories: STICKER_DATA.split(";")[2] || "🌿",
+            android: "https://github.com/pathum4563/Raganork-md/",
+            ios: "https://github.com/pathum4563/Raganork-md/"
         }
         await message.send(fs.readFileSync(await addExif(await sticker("attp.mp4",'video'),exif)),'sticker')
     
