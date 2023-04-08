@@ -31,7 +31,7 @@ Module({
   desc: 'Is bot alive?'
 }, (async (message, match) => {
   var myid = message.client.user.id.split(":")[0]
-  const stars = ['✦','✯','✯','✰','◬','✵'];
+  const stars = ['♥','✨','🎧','➩','❈',''];
   const star = stars[Math.floor(Math.random()*stars.length)];
   function shuffleArray(array) {
     for (var i = array.length - 1; i > 0; i--) {
@@ -65,14 +65,14 @@ Module({
   var menu = `╭═══〘 ${BOT_INFO.split(";")[0]} 〙═══⊷❍
 ┃${star}╭──────────────
 ┃${star}│
-┃${star}│ _*Owner*_ : ${BOT_INFO.split(";")[1]}
-┃${star}│ _*User*_ : ${message.senderName.replace( /[\r\n]+/gm, "" )}
-┃${star}│ _*Mode*_ : ${MODE}
-┃${star}│ _*Server*_ : ${__dirname.startsWith('/skl')?"Heroku":"Private (VPS)"}
-┃${star}│ _*Available RAM*_ : ${used} of ${total}
-┃${star}│ _*Version*_ : ${config.VERSION}
-┃${star}│
-┃${star}│
+┃${star}│ _*🌀Owner*_ : ${BOT_INFO.split(";")[1]}
+┃${star}│ _*🌀User*_ : ${message.senderName.replace( /[\r\n]+/gm, "" )}
+┃${star}│ _*🌀Mode*_ : ${MODE}
+┃${star}│ _*🌀Server*_ : ${__dirname.startsWith('/skl')?"Heroku":"Private (VPS)"}
+┃${star}│ _*🌀Available RAM*_ : ${used} of ${total}
+┃${star}│ _*🌀Version*_ : ${config.VERSION}
+┃${star}│ _*🌀whtsapp-user-bot-2023*_
+┃${star}│ _*https://chat.whatsapp.com/HV3Yu7ukP3J0ygRsepxBB8*_
 ┃${star}│  ▎▍▌▌▉▏▎▌▉▐▏▌▎
 ┃${star}│  ▎▍▌▌▉▏▎▌▉▐▏▌▎
 ┃${star}│   ${BOT_INFO.split(";")[0]}
@@ -89,7 +89,7 @@ return await message.client.sendMessage(message.jid,{
 Module({
   pattern: 'alive',
   fromMe: w,
-  desc: 'Is bot alive?'
+  desc: 'Is bot alive?🌀💫'
 }, (async (message, match) => {
   await parseAlive(message, ALIVE)
 }))
