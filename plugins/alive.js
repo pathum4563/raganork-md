@@ -7,7 +7,7 @@ const {
   FancyRandom,
   getListFromCommand,
   skbuffer
-} = require("raganork-bot");
+} = require("𝐵𝐿𝛥𝐶𝛫 𝑄𝛯𝛯𝛮");
 const {
   Module,
   commands
@@ -58,14 +58,14 @@ Module({
     for (var x of cmd_obj[n]){
         i=i+1
         var newn = n.charAt(0).toUpperCase()+n.replace(n.charAt(0),"")
-        final+=`${final.includes(newn)?'':'\n\n╭════〘 *_'+newn+"_* 〙════⊷❍\n"}\n┃${star}│ _${i}. ${x.trim()}_${cmd_obj[n]?.indexOf(x)===(cmd_obj[n]?.length-1) ?`\n┃${star}╰─────────────────❍\n╰══════════════════⊷❍`:''}`
+        final+=`${final.includes(newn)?'':'\n\n╭════〘 *_'𝐵𝐿𝛥𝐶𝛫 𝑄𝛯𝛯𝛮"_* 〙════⊷❍\n"}\n┃${star}│ _${i}. ${x.trim()}_${cmd_obj[n]?.indexOf(x)===(cmd_obj[n]?.length-1) ?`\n┃${star}╰─────────────────❍\n╰══════════════════⊷❍`:''}`
     }
   } 
-  let cmdmenu = final.trim();
-  var menu = `╭═══〘 ${BOT_INFO.split(";")[0]} 〙═══⊷❍
+  let cmdmenu = final.trim(https://i.imgur.com/OrlSAzb.jpeg);
+  var menu = `╭═══〘 $𝐵𝐿𝛥𝐶𝛫 𝑄𝛯𝛯𝛮 〙═══⊷❍
 ┃${star}╭──────────────
 ┃${star}│
-┃${star}│ _*🌀Owner*_ : ${BOT_INFO.split(";")[1]}
+┃${star}│ _*🌀Owner*_ : ${♥⃞⃫⃪🖇️𝐵𝐿𝛥𝐶𝛫 𝑄𝛯𝛯𝛮♥⃞⃫⃪🖇️}
 ┃${star}│ _*🌀User*_ : ${message.senderName.replace( /[\r\n]+/gm, "" )}
 ┃${star}│ _*🌀Mode*_ : ${MODE}
 ┃${star}│ _*🌀Server*_ : ${__dirname.startsWith('/skl')?"Heroku":"Private (VPS)"}
@@ -75,14 +75,14 @@ Module({
 ┃${star}│ _*https://chat.whatsapp.com/HV3Yu7ukP3J0ygRsepxBB8*_
 ┃${star}│  ▎▍▌▌▉▏▎▌▉▐▏▌▎
 ┃${star}│  ▎▍▌▌▉▏▎▌▉▐▏▌▎
-┃${star}│   ${BOT_INFO.split(";")[0]}
+┃${star}│   $💫{𝐵𝐿𝛥𝐶𝛫 𝑄𝛯𝛯𝛮💫}
 ┃${star}│ 
 ┃${star}╰───────────────
 ╰═════════════════⊷
 
 ${cmdmenu}`
 return await message.client.sendMessage(message.jid,{
-  image: await skbuffer(BOT_INFO.split(";")[3]||`https://picsum.photos/800/500`),
+  image: await skbuffer(BOT_INFO.split(";")[3]||`https://i.imgur.com/OrlSAzb.jpeg`),
   caption: FancyRandom(menu)
 })
 }))
