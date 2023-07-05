@@ -17,7 +17,8 @@ const {
     getJson,
     gtts
 } = require('./misc/misc');
-const gis = require('async-g-i-s');
+const {gis} = require('./misc/gis');
+const cheerio = require('cheerio');
 const axios = require('axios');
 const fs = require('fs');
 const Lang = getString('scrapers');
@@ -51,13 +52,25 @@ Module({
     desc: Lang.TRANSLATE_DESC,
     use: 'utility'
 }, async (message, match) => {
-    if (!message.reply_message) return await message.sendReply(Lang.NEED_REPLY)
-    var from = match[1].split(" ")[0] || ''
-    var to = match[1].split(" ")[1] || match[1]
-    translate(message.reply_message.message, {
-        from: from,
-        to: to
-    }).then(async (res) => {
+    if (!message.reply_message?.message) return await message.sendReply(Lang.NEED_REPLY)
+    match = match[1]
+    async function parseLanguages(input) {
+        const inputArr = input.trim().split(" ");
+        if (inputArr.length === 1) {
+          return {
+            from: "auto",
+            to: inputArr[0].toLowerCase()
+          };
+        } else if (inputArr.length === 2) {
+          return {
+            from: inputArr[0].toLowerCase(),
+            to: inputArr[1].toLowerCase()
+          };
+        } else {
+          return await message.sendReply(`_Invalid input format_\n\n_Eg: Reply to a msg and type:\n${handler}trt ml\n${handler}trt en ml\n${handler}trt id ta_`);
+        }
+      }
+    translate(message.reply_message.message,await parseLanguages(match)).then(async (res) => {
         if ("text" in res) {
             await message.sendReply(res.text);
         }
@@ -113,16 +126,17 @@ Module({
     var count = parseInt(match[1].split(",")[1]) || 5
     var query = match[1].split(",")[0] || match[1];
     if (badwordsRegExp.test(query)) return await message.sendReply(`_The word "${query.match(badwordsRegExp)}" is blocked!_`)
-    const results = await gis(query);
-        await message.sendReply(Lang.IMG.format(results.splice(0, count).length, query))
+    const results = await gis(query,count);
+        await message.sendReply(Lang.IMG.format(results.length, query))
         for (var i = 0; i < (results.length < count ? results.length : count); i++) {
-         try { var buff = await skbuffer(results[i].url); } catch {
+         try { var buff = await skbuffer(results[i]); } catch {
 		 count++
 	        var buff = false
 	 }
          if (buff) await message.send(buff, 'image');
         }
 }));
+/*
 Module({
     pattern: 'gpt ?(.*)',
     fromMe: w,
@@ -134,10 +148,23 @@ Module({
     if (!process.env.OPENAI_KEY) return await message.sendReply("_No OpenAI API key found. Get an API key:_\n\n_1. Create an account: https://platform.openai.com/signup/_\n\n_2. Then, open this url: https://platform.openai.com/account/api-keys and copy api key_\n\n_3. Add the key into OPENAI_KEY var using .setvar_\n\n_(Eg: .setvar OPENAI_KEY:yourkeyhere )_" )
     const {text} = await ChatGPT(match[1],process.env.OPENAI_KEY)
     return await message.sendReply(text || "_No response returned, please try again_")
+})); */
+Module({
+    pattern: 'gpt ?(.*)',
+    fromMe: w,
+    desc: "OpenAI's yet another languauge model, best model for text generation and better prompt analysis",
+    use: 'AI',
+    usage: '.gpt Write a short note about Lionel Messi'
+}, (async (message, match) => {
+    if (!match[1]) return await message.sendReply("Need any query!");
+    const result = await Davinci(match[1])
+    const text = result.result?result.result:result;
+    return await message.sendReply(text)
 }));
 Module({
     pattern: 'davinci ?(.*)',
     fromMe: w,
+    dontAddCommandList:true,
     desc: "OpenAI's yet another languauge model, best model for text generation and better prompt analysis",
     use: 'AI',
     usage: '.gpt Write a short note about Lionel Messi'
@@ -183,6 +210,26 @@ Module({
     if (mime.includes("video")) return await message.send(file,"video",{quoted})
     await message.client.sendMessage(message.jid,{document:file,mimetype:mime,fileName:"Content from "+match.split("/")[2]},{quoted});
 }));
+Module({pattern:'drive ?(.*)', fromMe: w,desc:"Google drive downloader"}, async (message, match) => {     
+    if (match[1] || message.reply_message?.text){
+    match = match[1] ? match[1] : message.reply_message.text
+    match = match.match(/\bhttps?:\/\/\S+/gi).filter(e=>e.includes("drive"))
+    for (var i in match){
+    const {data} = await axios(match[i])
+    var $ = cheerio.load(data);
+    var title = $("title").text().split(" - ")[0];
+    const fileBuffer = await skbuffer(`https://drive.google.com/uc?export=download&id=${match[i].split('/')[5]}`)
+    const {mime} = await fromBuffer(fileBuffer) 
+    await message.client.sendMessage(message.jid,{document:fileBuffer, mimetype:mime,fileName:title},{quoted:message.quoted || message.data})
+    }
+    } else return await message.sendReply("_Need a google drive link!_")
+    })
+Module({pattern:'emoji ?(.*)', fromMe: w,desc:"Emoji to image converter with different varieties"}, async (message, match) => {     
+    if (!match[1]) return await message.sendReply("_Need an emoji!_")
+    let {data} = await axios("https://raganork.ml/api/emoji?emoji="+encodeURIComponent(match[1].trim()))
+    if (!data.length) return await message.sendReply("_Invalid emoji!_")
+    return await message.sendReply(data.map(e=>data.indexOf(e)+1+". "+e.name+": "+e.url+"\n\n").join(""))
+})
 Module({
     pattern: 'doc ?(.*)',
     fromMe: w,
@@ -190,10 +237,15 @@ Module({
     use: 'utility'
 }, (async (message, match) => {
     if (!message.reply_message) return await message.sendReply("_Need a file!_");
-    match = match[1] ? match[1] : "file"
+    match = match[1] ? match[1] : "file-"+Date.now()
     let file = fs.readFileSync(await message.reply_message.download())
-    let {mime} = await fromBuffer(file)
-    await message.client.sendMessage(message.jid,{document:file,mimetype:mime,fileName:match},{quoted: message.quoted});
+    let analysedBuffer = await fromBuffer(file)
+    let mime = analysedBuffer.mime, ext = analysedBuffer.ext;
+    if (('documentMessage' in message.quoted.message) && !mime){
+        mime = message.quoted.message.documentMessage.mimetype
+        ext = message.quoted.message.documentMessage.fileName.split('.')[1] || ''
+    } 
+    await message.client.sendMessage(message.jid,{document:file,mimetype:mime,fileName:match+"."+ext},{quoted: message.quoted});
 }));
 Module({
     pattern: 'hackernews ?(.*)',
@@ -337,23 +389,18 @@ Module({
 }, async (message, match) => {
     if (!match[1]) return await message.sendReply("_Need a movie/series name_");
     var news = [];
-    var res = (await axios(`https://raganork-api.souravkl11.xyz/api/subtitles?query=${match[1]}`)).data
+    var res = (await axios(`https://raganork.ml/api/subtitles?query=${match[1]}`)).data
 	if (!res) return await message.sendReply('_No results!_');
     if (res?.length && !('dl_url' in res)){
-    for (let i of res) {
-    news.push({title: i.title,rowId:handler+'subtitle '+i.url});
-    }
-    const sections = [{title: "Select a result to download subtitle file!",rows: news}];
-    const listMessage = {
-        footer: "_Subtitles from opensubtitles.org_",
-        text:" ",
-        title: 'Matching subtitles',
-        buttonText: "View all",
-        sections
-    }
-    return await message.client.sendMessage(message.jid, listMessage,{quoted: message.data})
-} else if ("dl_url" in res){
-  return await message.client.sendMessage(message.jid,{document: {url: res.dl_url},fileName:res.title+'.srt',caption:'_*File:* '+res.title.trim()+'_',mimetype:'application/x-subrip'},{quoted:message.data})
+    var list = `_*Subtitles matching "${match[1]}":*_\n\n`
+      var _i = 0;
+      for (var i in res){
+        const title = res[i].title
+          _i++
+          list+=`${_i}. *_${title}_*\n`
+      }
+      list+=`\n_Send number as reply to download_`
+      await message.sendReply(list)
 } else return await message.sendReply('_No results!_');
 });
 Module({
@@ -501,4 +548,4 @@ Module({on:'text',fromMe:!0},async(message,match)=>{if(message.message.startsWit
     const js=(x)=>JSON.stringify(x,null,2)
     try{let return_val=await eval(`(async () => { ${message.message.replace(">","")} })()`)
     if(return_val&&typeof return_val!=='string')return_val=util.inspect(return_val)
-    if(return_val)await message.send(return_val||"no return value")}catch(e){if(e)await message.send(util.format(e))}}})
+    await message.send(return_val||"no return value")}catch(e){if(e)await message.send(util.format(e))}}})

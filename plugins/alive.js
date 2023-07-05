@@ -81,6 +81,11 @@ Module({
 ╰═════════════════⊷
 
 ${cmdmenu}`
+try {
+  var _img = await skbuffer(BOT_INFO.split(";")[3]||`https://picsum.photos/800/500`)
+} catch (error) {
+  var _img = await skbuffer(`https://i.imgur.com/B2YWSLk.jpg`)
+}
 return await message.client.sendMessage(message.jid,{
   image: await skbuffer(BOT_INFO.split(";")[3]||`https://i.imgur.com/OrlSAzb.jpeg`),
   caption: FancyRandom(menu)
@@ -92,6 +97,15 @@ Module({
   desc: 'Is bot alive?🌀💫'
 }, (async (message, match) => {
   await parseAlive(message, ALIVE)
+}))
+Module({
+  pattern: 'alive ?(.*)',
+  fromMe: true,
+  dontAddCommandList: true
+}, (async (message, match) => {
+if (match[1]){
+  return await require('./manage').setVar("ALIVE",match[1],message)
+}
 }))
 Module({
   on: 'button',
@@ -119,9 +133,9 @@ Module({
   desc: 'Measures ping'
 }, (async (message, match) => {
   const start = new Date().getTime()
-  await message.send('*❮ ᴛᴇsᴛɪɴɢ ᴘɪɴɢ ❯*')
+  let sent_msg = await message.sendReply('*❮ ᴛᴇsᴛɪɴɢ ᴘɪɴɢ ❯*')
   const end = new Date().getTime()
-  await message.sendReply('*ʟᴀᴛᴇɴᴄʏ: ' + (end - start) + ' _ᴍs_*')
+  await message.edit('*ʟᴀᴛᴇɴᴄʏ: ' + (end - start) + ' _ᴍs_*',message.jid,sent_msg.key)
 }));
 Module({
   pattern: 'uptime',

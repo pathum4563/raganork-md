@@ -94,6 +94,30 @@ Module({
         });
 }));
 Module({
+    pattern: 'speed ?(.*)',
+    fromMe: w,
+    use: 'edit',
+    desc: "Speeds up music & increases pitch. For making sped-up+reverb audios"
+}, (async (message, match) => {
+    if (message.reply_message === false) return await message.sendReply(Lang.MP3_NEED_REPLY)
+    var {seconds} = message.quoted.message[Object.keys(message.quoted.message)[0]];
+    if (seconds>120) await message.sendReply(`_Alert: Duration more than 2 mins. This process may fail or take much more time!_`)
+    var savedFile = await message.reply_message.download();
+    ffmpeg(savedFile)
+        .audioFilter("atempo=0.5")
+        .outputOptions(["-y", "-af", "asetrate=44100*1.2"])
+        .save("./temp/sped.mp3")
+        .on('end', async () => {
+            await message.client.sendMessage(message.jid, {
+                audio: fs.readFileSync('./temp/sped.mp3'),
+                mimetype: 'audio/mp4',
+                ptt: false
+            }, {
+                quoted: message.quoted
+            })
+        });
+}));
+Module({
     pattern: 'bass ?(.*)',
     fromMe: w,
     use: 'edit',
@@ -134,7 +158,7 @@ Module({
     desc: "Text to animated sticker"
 }, (async (message, match) => {
     if (match[1] == '') return await message.send("*Need text*")
-    var result = await skbuffer("https://raganork-api.herokuapp.com/api/attp?text="+encodeURI(match[1] +"&apikey=with_love_souravkl11")) 
+    var result = await skbuffer("https://raganork-api.onrender.com/api/attp?text="+encodeURI(match[1] +"&apikey=with_love_souravkl11")) 
     fs.writeFile("attp.mp4",result,async (e)=>{
         var exif = {
             author: STICKER_DATA.split(";")[1] || "",
